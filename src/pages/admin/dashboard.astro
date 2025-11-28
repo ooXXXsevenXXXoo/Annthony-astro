@@ -1,14 +1,10 @@
 ---
-import { redirect } from "astro";
+export async function get({ cookies }) {
+  const session = cookies.get("session");
 
-export async function get({ request }) {
-  const cookie = request.headers.get('cookie') || '';
-  const isAdmin = cookie.split(';').some(c => c.trim().startsWith('session=') && c.trim().includes('admin'));
-  if (!isAdmin) {
-    throw redirect(307, '/login');
-  }
-  return {};
-}
+  if (!session || session.value !== "admin") {
+    return Response.redirect("/login", 302);
+  }}
 ---
 
 <!doctype html>
