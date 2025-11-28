@@ -1,12 +1,11 @@
-// astro.config.mjs
+
 import { defineConfig } from 'astro/config';
-import netlify from '@astrojs/netlify/functions'; // funciones serverless de Netlify
+import netlify from '@astrojs/netlify'; // ya no usar /functions
 import tailwind from "@tailwindcss/vite";
 
 export default defineConfig({
-  output: "server",        // mantenemos server porque tu código usa SSR
-  adapter: netlify(),      // configuramos adapter para Netlify
-
+  output: "server",   
+  adapter: netlify(), 
   vite: {
     plugins: [tailwind()],
   }
