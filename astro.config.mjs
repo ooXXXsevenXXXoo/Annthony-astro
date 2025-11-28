@@ -1,12 +1,13 @@
-
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
-import netlify from '@astrojs/netlify'; // ya no usar /functions
+import netlify from '@astrojs/netlify';
 import tailwind from "@tailwindcss/vite";
 
 export default defineConfig({
-  output: "server",   
-  adapter: netlify(), 
+  output: "server", // mantenemos server porque quieres SSR
+  adapter: netlify(), // usa el adapter correcto sin /functions
+
   vite: {
     plugins: [tailwind()],
-  }
+  },
 });
