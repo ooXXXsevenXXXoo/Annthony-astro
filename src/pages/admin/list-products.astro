@@ -1,0 +1,32 @@
+---
+import fs from "fs";
+import path from "path";
+
+const filePath = path.join(Astro.root, "src", "data", "products.json");
+
+let products = [];
+
+if (fs.existsSync(filePath)) {
+  products = JSON.parse(fs.readFileSync(filePath, "utf8") || "[]");
+}
+---
+
+<html lang="es">
+  <body class="bg-black text-white p-8">
+    <h1 class="text-3xl mb-6 font-bold">Productos guardados</h1>
+
+    {products.length === 0 ? (
+      <p>No hay productos aún</p>
+    ) : (
+      <ul class="space-y-4">
+        {products.map(p => (
+          <li class="bg-gray-900 p-4 rounded">
+            <h2 class="text-xl font-bold">{p.name}</h2>
+            <p>Categoría: {p.category}</p>
+            <p>Precio: ${p.price}</p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </body>
+</html>

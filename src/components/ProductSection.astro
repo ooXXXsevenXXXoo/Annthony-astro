@@ -1,0 +1,17 @@
+---
+import ProductCard from "./ProductCard.astro";
+import { products } from "../data/products.js";
+
+const { categoria, titulo } = Astro.props;
+
+const filtrados = products.filter((p) => p.categoria === categoria);
+---
+<section class="mb-20">
+  <h2 class="text-3xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-pink-500 text-transparent bg-clip-text">
+    {titulo}
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    {filtrados.map((p) => <ProductCard {...p} />)}
+  </div>
+</section>

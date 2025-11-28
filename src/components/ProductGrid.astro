@@ -1,0 +1,173 @@
+---
+import { useState } from "preact/hooks";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+// Cargar productos dinámicos
+const filePath = fileURLToPath(new URL("../data/products.json", import.meta.url));
+let products = [];
+
+try {
+  if (fs.existsSync(filePath)) {
+    const raw = fs.readFileSync(filePath, "utf8");
+    products = JSON.parse(raw || "[]");
+  }
+} catch (err) {
+  console.error("ERROR LEYENDO PRODUCTS.JSON:", err);
+}
+
+// Categorías fijas
+const categories = ["Todos", "Tecnología", "Juguetería", "Decoración", "Accesorios"];
+---
+<div class="w-full">
+  
+  <!-- Buscar -->
+  <input
+    id="search"
+    type="text"
+    placeholder="Buscar productos..."
+    class="w-full max-w-2xl mx-auto block mb-6 px-4 py-3 rounded-xl
+           bg-gray-900 border border-gray-700 text-white outline-none"
+  />
+
+  <!-- Categorías -->
+  <div class="flex flex-wrap justify-center gap-3 mb-10">
+    {categories.map(cat => (
+      <button
+        class="px-5 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition"
+        data-category={cat}
+      >
+        {cat}
+      </button>
+    ))}
+  </div>
+
+  <!-- GRID DE PRODUCTOS -->
+  <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+    {products.map(product => (
+      <div
+        class="p-5 rounded-2xl bg-gray-900 border border-gray-800 shadow-lg
+               hover:border-purple-700 transition cursor-pointer"
+        data-cat={product.category}
+        data-name={product.name.toLowerCase()}
+        data-id={product.id}
+      >
+
+        <!-- IMAGEN O BLOQUE "SIN IMAGEN" -->
+        {product.image ? (
+          <img src={product.image} alt={product.name}
+            class="w-full h-48 object-cover rounded-lg mb-4" />
+        ) : (
+          <div class="w-full h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center text-gray-300">
+            Sin imagen
+          </div>
+        )}
+
+        <!-- INFORMACIÓN -->
+<h2 class="text-xl font-semibold text-white mb-2">{product.name}</h2>
+<p class="text-gray-300 mb-2">{product.description}</p>
+<p class="text-red-600 font-bold">${product.price}</p>
+
+<!-- BOTÓN COMPRAR (visible para todos) -->
+<a 
+  href="https://wa.me/qr/PJSDQ6HB4EQBE1"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <button 
+    class="w-full mt-3 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl font-semibold transition buy-btn"
+    data-id={product.id}
+  >
+    Comprar
+  </button>
+</a>
+
+<!-- BOTÓN ADMIN (solo si eres admin) -->
+<div class="admin-actions mt-3" style="display:none;">
+  <button
+    class="px-3 py-1 bg-fuchsia-700 text-white rounded hover:bg-red-700 transition delete-btn"
+    data-id={product.id}
+  >
+    Eliminar
+  </button>
+</div>
+
+
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  (async function () {
+    const search = document.getElementById("search");
+    const cards = document.querySelectorAll("[data-name]");
+    const buttons = document.querySelectorAll("[data-category]");
+
+    // --- 1. DETECTAR SI ES ADMIN ---
+    let isAdmin = false;
+    try {
+      const r = await fetch("/api/check-session");
+      const j = await r.json();
+      isAdmin = j.admin === true;
+    } catch (e) {}
+
+    // Mostrar botones solo si eres admin
+    if (isAdmin) {
+      document.querySelectorAll(".admin-actions").forEach(el => {
+        el.style.display = "block";
+      });
+    }
+
+    // --- 2. FILTRAR POR CATEGORIA ---
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const category = btn.dataset.category.toLowerCase();
+
+        cards.forEach(card => {
+          const show =
+            category === "todos" ||
+            card.dataset.cat.toLowerCase() === category;
+
+          card.style.display = show ? "block" : "none";
+        });
+      });
+    });
+
+    // --- 3. BUSQUEDA ---
+    search.addEventListener("input", () => {
+      const value = search.value.toLowerCase();
+
+      cards.forEach(card => {
+        const match = card.dataset.name.includes(value);
+        card.style.display = match ? "block" : "none";
+      });
+    });
+
+    // --- 4. ELIMINAR PRODUCTOS ---
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest(".delete-btn");
+      if (!btn) return;
+
+      const id = btn.dataset.id;
+
+      if (!confirm("¿Eliminar este producto?")) return;
+
+      const res = await fetch("/api/delete-product", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        const card = btn.closest("[data-id]");
+        card.style.opacity = "0";
+        setTimeout(() => card.remove(), 300);
+      } else {
+        alert("Error eliminando el producto.");
+      }
+    });
+  })();
+</script>

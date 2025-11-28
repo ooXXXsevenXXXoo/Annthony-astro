@@ -1,0 +1,191 @@
+---
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login — Admin</title>
+    <style>
+      :root{
+        --bg-1: #0f1720;
+        --bg-2: #0b1220;
+        --card: rgba(15,23,35,0.7);
+        --accent-a: #7c3aed; /* purple */
+        --accent-b: #06b6d4; /* cyan */
+        --glass: rgba(255,255,255,0.04);
+      }
+
+      html,body{
+        height:100%;
+        margin:0;
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        background: radial-gradient(1200px 600px at 10% 20%, rgba(124,58,237,0.12), transparent 10%),
+                    radial-gradient(1000px 500px at 90% 80%, rgba(6,182,212,0.08), transparent 8%),
+                    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+        color:#fff;
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
+      }
+
+      .wrap {
+        min-height:100vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:40px 20px;
+      }
+
+      .card {
+        width:100%;
+        max-width:420px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.06);
+        box-shadow: 0 20px 50px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+        border-radius: 16px;
+        padding: 28px;
+        backdrop-filter: blur(6px);
+      }
+
+      .brand {
+        display:flex;
+        align-items:center;
+        gap:12px;
+        margin-bottom:14px;
+      }
+
+      .logo-blob {
+        width:48px;
+        height:48px;
+        border-radius:12px;
+        background: linear-gradient(135deg,var(--accent-a),var(--accent-b));
+        box-shadow: 0 6px 20px rgba(6,182,212,0.12);
+      }
+
+      h2 { margin:0 0 8px 0; font-size:20px; }
+      p.lead { margin:0 0 18px 0; color:rgba(255,255,255,0.7); font-size:13px }
+
+      label { display:block; font-size:13px; margin-bottom:6px; color:rgba(255,255,255,0.8) }
+
+      input[type="text"], input[type="password"] {
+        width:100%;
+        padding:12px 14px;
+        border-radius:10px;
+        border: 1px solid rgba(255,255,255,0.04);
+        background: rgba(10,12,15,0.45);
+        color: #fff;
+        outline:none;
+        transition: box-shadow .15s, border-color .15s, transform .08s;
+      }
+      input:focus {
+        box-shadow: 0 6px 26px rgba(7,11,21,0.6);
+        border-color: rgba(124,58,237,0.6);
+        transform: translateY(-1px);
+      }
+
+      .btn {
+        width:100%;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        padding:10px 14px;
+        border-radius:10px;
+        border:none;
+        cursor:pointer;
+        font-weight:600;
+        background: linear-gradient(90deg,var(--accent-a),var(--accent-b));
+        color:#071028;
+        box-shadow: 0 8px 30px rgba(124,58,237,0.12);
+      }
+
+      .hint { margin-top:12px; text-align:center; font-size:13px; color:rgba(255,255,255,0.6) }
+
+      .msg {
+        margin-bottom:12px;
+        padding:8px 10px;
+        border-radius:8px;
+        font-size:13px;
+        display:none;
+      }
+      .msg.error { background: rgba(255,60,60,0.08); color:#ff8b8b; border:1px solid rgba(255,60,60,0.14) }
+      .msg.success { background: rgba(60,255,200,0.06); color:#9ff0dd; border:1px solid rgba(60,255,200,0.08) }
+
+      .small { font-size:12px; color: rgba(255,255,255,0.55); margin-top:10px; text-align:center }
+      @media (max-width:520px){
+        .card { padding:20px; border-radius:12px }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <form id="loginForm" class="card" autocomplete="off">
+        <div class="brand">
+          <div class="logo-blob" aria-hidden></div>
+          <div>
+            <h2>Admin Panel</h2>
+            <p class="lead">Ingresa con tus credenciales de administrador.</p>
+          </div>
+        </div>
+
+        <div id="msg" class="msg error" role="alert" style="display:none;"></div>
+
+        <label for="user">Usuario</label>
+        <input id="user" name="user" type="text" placeholder="admin" required />
+
+        <label for="password" style="margin-top:10px;">Contraseña</label>
+        <input id="password" name="password" type="password" placeholder="••••••••" required />
+
+        <div style="height:12px"></div>
+
+        <button class="btn" type="submit">
+          Ingresar
+        </button>
+
+        <div class="hint">Solo administradores — acceso restringido</div>
+        <div class="small">¿Olvidaste la contraseña? Contáctate con el administrador principal.</div>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById('loginForm');
+      const msg = document.getElementById('msg');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        msg.style.display = 'none';
+
+        const user = document.getElementById('user').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        try {
+          const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user, password })
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.ok) {
+            msg.className = 'msg success';
+            msg.textContent = data.message || 'Bienvenido';
+            msg.style.display = 'block';
+
+            // pequeña pausa para que el usuario vea el mensaje
+            setTimeout(() => window.location.href = '/admin/dashboard', 500);
+          } else {
+            msg.className = 'msg error';
+            msg.textContent = data.message || data.error || 'Credenciales incorrectas';
+            msg.style.display = 'block';
+          }
+        } catch (err) {
+          msg.className = 'msg error';
+          msg.textContent = 'Error de red. Intenta de nuevo.';
+          msg.style.display = 'block';
+        }
+      });
+    </script>
+  </body>
+</html>

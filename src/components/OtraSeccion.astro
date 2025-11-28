@@ -1,0 +1,138 @@
+---
+import products from "../data/products.json"; // AJUSTA LA RUTA SI ES NECESARIO
+
+/**
+ * Función para barajar (shuffle) un array de forma aleatoria (Algoritmo de Fisher-Yates).
+ */
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// 1. Barajar la lista de productos y guardar el resultado
+const shuffledProducts = shuffleArray([...products]);
+
+// 2. Usaremos esta variable en el HTML
+const productsToShow = shuffledProducts;
+---
+
+<style>
+  /* Animación del carrusel */
+  @keyframes slide {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-250px * 4)); /* cantidad visible desplazada */
+    }
+  }
+
+  .slider-track {
+    animation: slide 14s linear infinite;
+  }
+
+  .slider-container:hover .slider-track {
+    animation-play-state: paused;
+  }
+</style>
+
+<section class="py-24 px-6 max-w-7xl mx-auto">
+
+  <h2 
+    class="text-4xl md:text-5xl font-bold text-center mb-10 
+           bg-gradient-to-r from-lime-400 via-green-700 to-purple-500 
+           bg-clip-text text-transparent drop-shadow-lg"
+  >
+    Productos en Tendencia 
+  </h2>
+
+  <p class="text-center text-white max-w-2xl mx-auto mb-16">
+    Explora los artículos más populares del momento. Productos únicos y modernos hechos para tu estilo.
+  </p>
+
+  <div class="slider-container overflow-hidden relative w-full">
+
+    <div 
+      class="slider-track flex gap-8"
+      style={`width: calc(250px * ${productsToShow.length * 2})`}
+    >
+
+      {productsToShow.map((product) => (
+        <div
+          class="min-w-[250px] bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl 
+                 shadow-lg transition-all duration-300 cursor-pointer
+                 hover:shadow-[0_0_35px_rgba(0,170,255,0.5)]
+                 hover:border-pink-500 hover:-translate-y-2"
+        >
+          <div class="w-full h-40 rounded-xl mb-4 overflow-hidden bg-black/20">
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              class="w-full h-full object-cover"
+            />
+          </div>
+
+          <h3 class="text-xl font-semibold text-white mb-1">{product.name}</h3>
+
+          <p class="text-gray-300 text-sm">
+            {product.description ?? "Producto disponible"}
+          </p>
+
+          <a 
+            href="/tienda" 
+            class="mt-4 inline-block px-4 py-2 rounded-xl bg-gradient-to-r from-purple-700 to-violet-500 text-black font-semibold
+                   hover:opacity-90 transition"
+          >
+            Ver más
+          </a>
+        </div>
+      ))}
+
+      {productsToShow.map((product) => (
+        <div
+          class="min-w-[250px] bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl 
+                 shadow-lg transition-all duration-300 cursor-pointer
+                 hover:shadow-[0_0_35px_rgba(0,170,255,0.5)]
+                 hover:border-cyan-400/40 hover:-translate-y-2"
+        >
+          <div class="w-full h-40 rounded-xl mb-4 overflow-hidden bg-black/20">
+            <img 
+              src={product.image} 
+              alt={product.name} 
+              class="w-full h-full object-cover"
+            />
+          </div>
+
+          <h3 class="text-xl font-semibold text-white mb-1">{product.name}</h3>
+
+          <p class="text-gray-300 text-sm">
+            {product.description ?? "Producto disponible"}
+          </p>
+
+          <a 
+            href="/tienda"
+            class="mt-4 inline-block px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 text-black font-semibold
+                   hover:opacity-90 transition"
+          >
+            Ver más
+          </a>
+        </div>
+      ))}
+
+    </div>
+
+    <div class="mt-20 flex justify-center">
+      <a 
+        href="/tienda" 
+        class="px-6 py-3 bg-pink-500 text-white text-lg rounded-xl shadow-lg 
+               hover:bg-pink-800 hover:shadow-xl transition active:scale-95"
+      >
+        Ver más
+      </a>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,25 @@
+---
+// src/components/ProductCard.astro
+const { id, nombre, precio, descripcion, imagen, categoria, subcategoria, slug } = Astro.props;
+const detailHref = `/producto/${slug ?? id}`;
+---
+
+<article
+  class="group relative bg-white/5 border border-white/8 rounded-2xl p-4 overflow-hidden
+         backdrop-blur-sm hover:shadow-[0_12px_40px_rgba(0,150,255,0.06)] transition-transform duration-300
+         hover:-translate-y-2 cursor-pointer"
+>
+  <a href={detailHref} class="block">
+    <div class="w-full h-44 rounded-xl overflow-hidden mb-4 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+      <img src={imagen} alt={nombre} class="w-full h-full object-cover" />
+    </div>
+
+    <h3 class="text-lg font-semibold text-white mb-1">{nombre}</h3>
+    <p class="text-gray-300 text-sm mb-3 line-clamp-2">{descripcion}</p>
+
+    <div class="flex items-center justify-between mt-2">
+      <span class="text-xl font-bold text-cyan-300">${precio}</span>
+      <span class="text-xs px-2 py-1 rounded bg-white/6 text-gray-200">{categoria} / {subcategoria}</span>
+    </div>
+  </a>
+</article>

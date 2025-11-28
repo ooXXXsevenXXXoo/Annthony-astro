@@ -1,0 +1,35 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ProductGrid from "../components/ProductGrid.astro";
+---
+
+<Layout title="Tienda — CyberPhonk">
+
+  <section class="max-w-7xl mx-auto px-6 py-16">
+
+    <!-- BOTÓN REGRESAR (ubicación mejorada) -->
+    <div class="mb-10 flex justify-center">
+      <a 
+        href="/"
+        class="px-6 py-3 rounded-xl font-semibold 
+               bg-gradient-to-r from-purple-600 to-green-500
+               hover:opacity-80 transition text-white shadow-lg"
+      >
+        ⬅ Volver al Menú Principal
+      </a>
+    </div>
+
+    <!-- TÍTULO -->
+    <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-6
+               bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-purple-700">
+      Tienda — Explora nuestras categorías
+    </h1>
+
+    <p class="text-center text-gray-300 max-w-2xl mx-auto mb-12">
+      Usa las pestañas para cambiar de categoría, busca por nombre o filtra por subcategoría.
+    </p>
+
+    <ProductGrid client:load />
+  </section>
+
+</Layout>

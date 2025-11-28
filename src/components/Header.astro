@@ -1,0 +1,182 @@
+<header 
+  class="w-full fixed top-0 left-0 z-50 backdrop-blur-xl bg-black/30 border-b border-white/10
+         shadow-[0_0_20px_rgba(0,255,255,0.15)]">
+
+  <div class="w-full h-[3px] bg-lime-400/40 animate-slideGlow"></div>
+
+  <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    
+    <a 
+      href="/"
+      class="flex items-center gap-2 text-2xl font-bold tracking-wider text-lime-400 
+             drop-shadow-[0_0_10px_cyan] hover:drop-shadow-[0_0_14px_cyan]
+             transition-all duration-200"
+    >
+      <img 
+        src="/src/icons/card.jpg" 
+        alt="Logo" 
+        class="h-8 object-contain" 
+      />
+      <span>Jokx</span>
+    </a>
+
+    <ul class="hidden md:flex gap-10 text-gray-300 text-sm tracking-wide">
+      <li class="group cursor-pointer">
+        <a class="transition group-hover:text-white group-hover:drop-shadow-[0_0_6px_cyan]">
+          Inicio
+        </a>
+        <div class="h-[2px] w-0 bg-lime-400 group-hover:w-full transition-all duration-300 mx-auto"></div>
+      </li> 	
+      <li class="group cursor-pointer">
+        <a class="transition group-hover:text-white group-hover:drop-shadow-[0_0_6px_lime]">
+          Ofertas
+        </a>
+        <div class="h-[2px] w-0 bg-lime-400 group-hover:w-full transition-all duration-300 mx-auto"></div>
+      </li>
+
+      <li class="group cursor-pointer">
+        <a  href="https://wa.me/qr/PJSDQ6HB4EQBE1"
+        class="transition group-hover:text-white group-hover:drop-shadow-[0_0_6px_white]">
+          Contacto
+        </a>
+        <div class="h-[2px] w-0 bg-lime-400 group-hover:w-full transition-all duration-300 mx-auto"></div>
+      </li>
+    </ul>
+
+    <div class="hidden md:flex items-center gap-4">
+
+      <button 
+        class="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center
+               hover:bg-white/10 hover:drop-shadow-[0_0_10px_cyan] transition">
+        <svg class="w-5 h-5 text-gray-200" fill="none" stroke="currentColor" 
+             stroke-width="1.6" viewBox="0 0 24 24">
+          <path d="M3 3h2l3.6 9.6a1 1 0 0 0 1 .7h7.8a1 1 0 0 0 .9-.6L23 6H6" />
+          <circle cx="10" cy="20" r="1" />
+          <circle cx="18" cy="20" r="1" />
+        </svg>
+      </button>
+
+      <div id="header-admin-area" class="flex items-center gap-3">
+        <a id="loginBtnHeader" href="/login" class="px-3 py-2 rounded-lg bg-white/5 text-white hover:bg-white/10 transition">
+          Iniciar sesión
+        </a>
+
+        <div id="adminActions" style="display:none;" class="flex items-center gap-3">
+          <a id="dashboardLink" href="/admin/dashboard" class="px-3 py-2 rounded-lg bg-green-500 text-black font-semibold hover:brightness-95 transition">
+            Agregar
+          </a>
+          <button id="logoutBtn" class="px-3 py-2 rounded-lg bg-fuchsia-700 text-white hover:bg-red-600 transition">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  <div id="mobileMenu"
+       class="md:hidden hidden flex-col bg-black/60 backdrop-blur-xl border-t border-white/10 px-6 py-4 space-y-4">
+    <a class="text-gray-300 hover:text-white transition">Inicio</a>
+    <a class="text-gray-300 hover:text-white transition">Productos</a>
+    <a class="text-gray-300 hover:text-white transition">Ofertas</a>
+    <a class="text-gray-300 hover:text-white transition">Contacto</a>
+
+    <div class="pt-2 border-t border-white/6">
+      <a id="mobileLogin" href="/login" class="block text-gray-300 hover:text-white py-2">Iniciar sesión</a>
+      <div id="mobileAdminActions" style="display:none;">
+        <a id="mobileDashboard" href="/admin/dashboard" class="block text-gray-200 py-2">Dashboard</a>
+        <button id="mobileLogout" class="w-full text-left text-red-400 py-2">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  @keyframes slideGlow {
+    0% { opacity: 0.2 }
+    50% { opacity: 1 }
+    100% { opacity: 0.2 }
+  }
+</style>
+
+<script>
+  // Comprueba si existe sesión en el server (endpoint /api/check-session debe existir)
+  async function checkSession() {
+    try {
+      const res = await fetch('/api/check-session');
+      const j = await res.json();
+      const isAdmin = res.ok && j && j.ok && j.admin === true;
+
+      // Mostrar area admin (por defecto oculta en CSS si lo quieres)
+      // manipulamos solo la visibilidad de los elementos nuevos
+      const headerArea = document.getElementById('header-admin-area');
+      if (headerArea) headerArea.style.display = 'flex';
+
+      const loginBtn = document.getElementById('loginBtnHeader');
+      const adminActions = document.getElementById('adminActions');
+
+      const mobileLogin = document.getElementById('mobileLogin');
+      const mobileAdminActions = document.getElementById('mobileAdminActions');
+
+      if (isAdmin) {
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (adminActions) adminActions.style.display = 'flex';
+        if (mobileLogin) mobileLogin.style.display = 'none';
+        if (mobileAdminActions) mobileAdminActions.style.display = 'block';
+      } else {
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (adminActions) adminActions.style.display = 'none';
+        if (mobileLogin) mobileLogin.style.display = 'block';
+        if (mobileAdminActions) mobileAdminActions.style.display = 'none';
+      }
+    } catch (err) {
+      // si falla, mostramos botón login por defecto
+      const headerArea = document.getElementById('header-admin-area');
+      if (headerArea) headerArea.style.display = 'flex';
+    }
+  }
+
+  checkSession();
+
+  // Logout (desktop)
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    window.location.reload();
+  });
+
+  // Logout (mobile)
+  document.getElementById('mobileLogout')?.addEventListener('click', async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    window.location.reload();
+  });
+
+  // Toggle mobile menu
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
+</script>
+<script>
+  async function checkHeaderSession() {
+    try {
+      const res = await fetch('/api/check-session');
+      const data = await res.json();
+      const isAdmin = data?.admin === true;
+
+      const adminBtns = document.querySelectorAll('.admin-only');
+      const loginBtn = document.getElementById('loginBtnHeader');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (adminBtns) {
+        adminBtns.forEach(btn => btn.style.display = isAdmin ? 'block' : 'none');
+      }
+      if (loginBtn) loginBtn.style.display = isAdmin ? 'none' : 'block';
+      if (logoutBtn) logoutBtn.style.display = isAdmin ? 'block' : 'none';
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  checkHeaderSession();
+</script>

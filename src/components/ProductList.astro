@@ -1,0 +1,21 @@
+---
+import ProductCard from "./ProductCard.astro";
+
+const { category } = Astro.props;
+
+const products = [
+  { id: 1, title: "Lámpara LED RGB", price: "$39", category: "tecnologia" },
+  { id: 2, title: "Peluche Premium", price: "$25", category: "jugueteria" },
+  { id: 3, title: "Cuadro Minimalista", price: "$29", category: "decoracion" }
+];
+
+const filtered = category
+  ? products.filter(p => p.category === category)
+  : products;
+---
+
+<div class="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+  {filtered.map(product => (
+    <ProductCard {...product} />
+  ))}
+</div>

@@ -1,0 +1,97 @@
+---
+import { redirect } from "astro";
+
+export async function get({ request }) {
+  const cookie = request.headers.get('cookie') || '';
+  const isAdmin = cookie.split(';').some(c => c.trim().startsWith('session=') && c.trim().includes('admin'));
+  if (!isAdmin) {
+    throw redirect(307, '/login');
+  }
+  return {};
+}
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin — Dashboard</title>
+    <style>
+      :root {
+        --bg: linear-gradient(180deg,#05060a,#0b1220);
+        --card: rgba(255,255,255,0.02);
+        --accent: linear-gradient(90deg,#7c3aed,#06b6d4);
+      }
+
+      html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#fff;background:var(--bg)}
+      .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 20px}
+      .panel{width:100%;max-width:980px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:16px;padding:28px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 20px 40px rgba(2,6,23,0.6)}
+      .top {display:flex;align-items:center;justify-content:space-between;gap:12px}
+      .title {font-size:28px;font-weight:800}
+      .subtitle {color:rgba(255,255,255,0.7);font-size:14px}
+      .controls {display:flex;gap:12px;align-items:center}
+      .btn {padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+      .btn-primary {background:var(--accent); color:#071028; box-shadow:0 10px 30px rgba(12,8,40,0.25)}
+      .btn-ghost {background:transparent;border:1px solid rgba(255,255,255,0.06); color:rgba(255,255,255,0.9)}
+      .grid {margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+      .card {background:rgba(255,255,255,0.02);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 24px rgba(2,6,23,0.5)}
+      .card h3{margin:0 0 8px 0;font-size:16px}
+      .card p{margin:0;color:rgba(255,255,255,0.7);font-size:13px}
+      .logout {margin-left:8px}
+      @media (max-width:900px){ .grid{grid-template-columns:repeat(1,1fr)} }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <div class="panel">
+        <div class="top">
+          <div>
+            <div class="title">Bienvenido, Admin</div>
+            <div class="subtitle">Aquí puedes gestionar los productos de la tienda. Agrega, edita o elimina artículos.</div>
+          </div>
+
+          <div class="controls">
+            <a href="/admin/products" class="btn btn-primary" style="text-decoration:none">➕ Agregar producto</a>
+
+            <!-- Botón de logout: debe tener id=logoutBtn para el script del header -->
+            <button id="logoutBtn" class="btn btn-ghost logout">🚪 Cerrar sesión</button>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top:28px">
+          <div class="card">
+            <h3>Productos totales</h3>
+            <p>Revisa, elimina o edita los productos que has subido al inventario.</p>
+          </div>
+
+          <div class="card">
+            <h3>Visitas</h3>
+            <p>Información de tráfico no disponible (puedes integrar analytics).</p>
+          </div>
+
+          <div class="card">
+            <h3>Configuración</h3>
+            <p>Accesos, políticas y ajustes generales de la tienda.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // botón de logout: usa POST a /api/logout para expirar cookie
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          try {
+            await fetch('/api/logout', { method: 'POST' });
+          } catch (err) { /* ignore */ }
+          // recarga para que la UI del sitio se actualice
+          window.location.href = '/';
+        });
+      }
+    </script>
+  </body>
+</html>
